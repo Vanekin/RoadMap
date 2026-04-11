@@ -1,0 +1,18 @@
+{
+  "name": "vanekin/roadmap",
+  "description": "Карта дорожных происшествий",
+  "type": "project",
+  "require": {
+    "php": ">=8.0",
+    "vlucas/phpdotenv": "^5.6",
+    "monolog/monolog": "^3.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "RoadMap\\": "src/"
+    }
+  },
+  "config": {
+    "optimize-autoloader": true
+  }
+}

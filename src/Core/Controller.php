@@ -1,9 +1,10 @@
 <?php
 
-namespace RoadMap;
+namespace RoadMap\Core;
 
-abstract class Controller
-{
+use RoadMap\Core\Exceptions\CriticallException;
+
+abstract class Controller {
     protected Router $router;
 
     public function __construct(Router $router)
@@ -16,14 +17,12 @@ abstract class Controller
 
         extract($data);
 
-        $viewPath = __DIR__ . '/../templates/pages/' . $view . '.php';
+        $viewPath = __DIR__ . '/../../templates/pages/' . $view . '.php';
 
         if (!file_exists($viewPath)) {
-            $this->renderError(500, "Файл  {$view} не найден");
-            return;
+            throw new CriticallException("Файл  {$view} не найден");
         }
 
-        // Буферизация содержимого представления
         ob_start();
         require $viewPath;
         $content = ob_get_clean();
@@ -44,26 +43,10 @@ abstract class Controller
         header('Location: ' . $url);
         exit;
     }
-
-
-    protected function renderError(int $code, string $message = ''): void {
-        http_response_code($code);
-        echo "<h1>Error {$code}</h1>";
-        echo "<p>{$message}</p>";
-        exit;
-    }
-
     protected function getRequestParams(): array
     {
         return $this->router->getRequestParams();
     }
-
-
-    protected function getFiles(): array
-    {
-        return $this->router->getFiles();
-    }
-
     protected function getMethod(): string
     {
         return $this->router->getMethod();

@@ -47,7 +47,10 @@
 
 <div class="welcome-page">
     <div class="welcome-content">
+        <form method="GET" action="/incidents/create">
         <h1>Добро пожаловать!</h1>
         <p>Желаем хорошей дороги!</p>
+            <button type="submit">Создать</button>
+
     </div>
 </div>

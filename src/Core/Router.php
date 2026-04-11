@@ -1,7 +1,9 @@
 <?php
 
 
-namespace RoadMap;
+namespace RoadMap\Core;
+use RoadMap\Core\Exceptions\CriticallException;
+use RoadMap\Core\Exceptions\PageNotFoundException;
 
 class Router
 {
@@ -26,7 +28,7 @@ class Router
             return;
         }
 
-        if ($this->method === 'POST' && empty($_SERVER['CONTENT_TYPE'])) {
+        if ($this->method === 'POST') {
             $this->requestParams = $_POST;
             return;
         }
@@ -52,12 +54,14 @@ class Router
         return $this->method;
     }
 
-    public function dispatch(string $url): void {
+    public function dispatch(string $url): void
+    {
+        // Статические файлы
         $fullPath = __DIR__ . '/../../public' . $url;
-
         if (file_exists($fullPath) && is_file($fullPath)) {
             $ext = pathinfo($fullPath, PATHINFO_EXTENSION);
             $mimeTypes = [
+                'ico' => 'image/x-icon',
                 'jpg' => 'image/jpeg',
                 'jpeg' => 'image/jpeg',
                 'png' => 'image/png',
@@ -66,7 +70,6 @@ class Router
                 'css' => 'text/css',
                 'js' => 'application/javascript',
                 'svg' => 'image/svg+xml',
-                'ico' => 'image/x-icon',
             ];
 
             $mime = $mimeTypes[$ext] ?? 'application/octet-stream';
@@ -74,9 +77,8 @@ class Router
             readfile($fullPath);
             exit;
         }
-        $url = '/' . ltrim($url, '/');
 
-        $matched = false;
+        $url = '/' . ltrim($url, '/');
 
         foreach ($this->routes as $routePattern => $handler) {
             $pattern = preg_replace_callback('/\{([a-zA-Z_][a-zA-Z0-9_]*)(?::([^}]+))?\}/', function ($matches) {
@@ -88,30 +90,29 @@ class Router
             $pattern = '#^' . $pattern . '$#';
 
             if (preg_match($pattern, $url, $matches)) {
-                // Извлекаем параметры из URL
                 foreach ($matches as $key => $value) {
                     if (is_string($key)) {
                         $this->urlParams[$key] = $value;
                     }
                 }
 
-                $matched = true;
-
                 if (is_array($handler) && count($handler) === 2) {
-                    $controllerClass = $handler[0];
-                    $method = $handler[1];
+                    [$controllerClass, $method] = $handler;
+
                     if (!class_exists($controllerClass)) {
-                        $this->sendError(500, "Controller {$controllerClass} not found");
-                        return;
+                        throw new CriticallException("Controller {$controllerClass} not found");
                     }
+
                     $controller = new $controllerClass($this);
+
                     if (!method_exists($controller, $method)) {
-                        $this->sendError(500, "Method {$method} not found in {$controllerClass}");
-                        return;
+                        throw new CriticallException("Method {$method} not found");
                     }
+
                     $controller->$method();
                     return;
                 }
+
                 if (is_string($handler) && class_exists($handler)) {
                     $controller = new $handler($this);
                     if (method_exists($controller, 'index')) {
@@ -120,19 +121,12 @@ class Router
                     }
                 }
 
-                $this->sendError(500, "Сервер не смог обработать запрос");
-                return;
+                throw new CriticallException("Сервер не смог обработать запрос");
             }
         }
-        if (!$matched) {
-            $this->sendError(404, "Страница не найдена");
-        }
+
+        throw new PageNotFoundException();
     }
 
-    private function sendError(int $code, string $message): void
-    {
-        http_response_code($code);
-        echo "$message";
-        exit;
-    }
+
 }

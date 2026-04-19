@@ -49,26 +49,83 @@
         font-size: 14px;
         margin-top: 5px;
     }
+    .coordinates {
+        display: flex;
+        gap: 15px;
+    }
+    .coordinates .form-group {
+        flex: 1;
+    }
 </style>
 
 <div class="form-container">
     <h1>Добавить происшествие</h1>
+
+    <?php if (isset($errors) && !empty($errors)): ?>
+        <div class="error">
+            <strong>Ошибка:</strong>
+            <ul>
+                <?php foreach ($errors as $error): ?>
+                    <li><?= htmlspecialchars($error) ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+
     <form method="POST" action="/incidents/store">
         <div class="form-group">
-            <label for="title">Название происшествия</label>
+            <label for="title">Название происшествия *</label>
             <input type="text"
                    id="title"
                    name="title"
                    value="<?= htmlspecialchars($old['title'] ?? '') ?>"
-                   placeholder="Например: Огромная яма на Фучика">
+                   placeholder="Например: Огромная яма на Фучика"
+                   required>
         </div>
 
         <div class="form-group">
-            <label for="description">Описание</label>
+            <label for="description">Описание *</label>
             <textarea id="description"
                       name="description"
                       rows="5"
-                      placeholder="Опишите подробности..."><?= htmlspecialchars($old['description'] ?? '') ?></textarea>
+                      placeholder="Опишите подробности..."
+                      required><?= htmlspecialchars($old['description'] ?? '') ?></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="address">Адрес *</label>
+            <input type="text"
+                   id="address"
+                   name="address"
+                   value="<?= htmlspecialchars($old['address'] ?? '') ?>"
+                   placeholder="Например: г. Москва, ул. Тверская, д. 1"
+                   required>
+        </div>
+
+        <div class="coordinates">
+            <div class="form-group">
+                <label for="latitude">Широта (latitude) *</label>
+                <input type="number"
+                       id="latitude"
+                       name="latitude"
+                       step="any"
+                       value="<?= htmlspecialchars($old['latitude'] ?? '55.751244') ?>"
+                       placeholder="55.751244"
+                       required>
+                <small style="color:#666; display:block;">Пример: 55.751244</small>
+            </div>
+
+            <div class="form-group">
+                <label for="longitude">Долгота (longitude) *</label>
+                <input type="number"
+                       id="longitude"
+                       name="longitude"
+                       step="any"
+                       value="<?= htmlspecialchars($old['longitude'] ?? '37.618423') ?>"
+                       placeholder="37.618423"
+                       required>
+                <small style="color:#666; display:block;">Пример: 37.618423</small>
+            </div>
         </div>
 
         <button type="submit">Сохранить</button>

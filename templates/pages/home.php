@@ -43,14 +43,28 @@
         font-size: 20px;
         text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     }
+    .button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: lightgrey;
+        color: black;
+        text-decoration: none;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .button:hover {
+        background-color: #0056b3;
+    }
 </style>
 
 <div class="welcome-page">
     <div class="welcome-content">
-        <form method="GET" action="/incidents/create">
         <h1>Добро пожаловать!</h1>
         <p>Желаем хорошей дороги!</p>
-            <button type="submit">Создать</button>
+        <a href="/incidents/create" class="button">Создать</a>
+        <a href="/register" class="button">Регистрация</a>
 
     </div>
 </div>

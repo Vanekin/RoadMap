@@ -71,8 +71,9 @@
 
     <div class="incident-details">
         <h3>Детали происшествия:</h3>
-        <p><strong>Название:</strong> <?= htmlspecialchars($old['title'] ?? '') ?></p>
-        <p><strong>Описание:</strong> <?= htmlspecialchars($old['description'] ?? '') ?></p>
+        <p><strong>Название:</strong> <?= htmlspecialchars($title ?? '') ?></p>
+        <p><strong>Описание:</strong> <?= htmlspecialchars($description ?? '') ?></p>
+        <p><strong>Адрес:</strong> <?= htmlspecialchars($address ?? '') ?></p>
     </div>
 
     <div class="buttons">

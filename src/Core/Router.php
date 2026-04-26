@@ -4,6 +4,7 @@
 namespace RoadMap\Core;
 use RoadMap\Core\Exceptions\CriticallException;
 use RoadMap\Core\Exceptions\PageNotFoundException;
+use RoadMap\Core\Attributes\Route;
 
 class Router
 {
@@ -13,12 +14,37 @@ class Router
     private array $requestParams = [];
     private array $files;
 
-    public function __construct(array $routes)
+    public function __construct(array $controllers)
     {
-        $this->routes = $routes;
+
         $this->method = $_SERVER['REQUEST_METHOD'];
         $this->files = $_FILES;
         $this->extractRequestParams();
+        $this->register($controllers);
+    }
+
+    public function register(array $controllers): void
+    {
+        foreach ($controllers as $controllerClass) {
+            $reflectionClass = new \ReflectionClass($controllerClass);
+
+            foreach ($reflectionClass->getMethods() as $method) {
+                $attributes = $method->getAttributes(Route::class);
+
+                foreach ($attributes as $attribute) {
+                    /** @var Route $route */
+                    $route = $attribute->newInstance();
+
+                    $handler = [$controllerClass, $method->getName()];
+                    $path = $route->path;
+                    $httpMethods = (array) $route->method;
+
+                    foreach ($httpMethods as $httpMethod) {
+                        $this->routes[strtoupper($httpMethod)][$path] = $handler;
+                    }
+                }
+            }
+        }
     }
 
     private function extractRequestParams(): void
@@ -37,11 +63,6 @@ class Router
     public function getRequestParams(): array
     {
         return $this->requestParams;
-    }
-
-    public function getFiles(): array
-    {
-        return $this->files;
     }
 
     public function getUrlParams(): array
@@ -80,7 +101,10 @@ class Router
 
         $url = '/' . ltrim($url, '/');
 
-        foreach ($this->routes as $routePattern => $handler) {
+        // Получаем маршруты для текущего HTTP метода
+        $routesByMethod = $this->routes[$this->method] ?? [];
+
+        foreach ($routesByMethod as $routePattern => $handler) {
             $pattern = preg_replace_callback('/\{([a-zA-Z_][a-zA-Z0-9_]*)(?::([^}]+))?\}/', function ($matches) {
                 $paramName = $matches[1];
                 $regex = $matches[2] ?? '[^/]+';
@@ -100,13 +124,13 @@ class Router
                     [$controllerClass, $method] = $handler;
 
                     if (!class_exists($controllerClass)) {
-                        throw new CriticallException("Controller {$controllerClass} not found");
+                        throw new CriticalException("Controller {$controllerClass} not found");
                     }
 
                     $controller = new $controllerClass($this);
 
                     if (!method_exists($controller, $method)) {
-                        throw new CriticallException("Method {$method} not found");
+                        throw new CriticalException("Method {$method} not found");
                     }
 
                     $controller->$method();
@@ -121,12 +145,10 @@ class Router
                     }
                 }
 
-                throw new CriticallException("Сервер не смог обработать запрос");
+                throw new CriticalException("Сервер не смог обработать запрос");
             }
         }
 
         throw new PageNotFoundException();
     }
-
-
 }

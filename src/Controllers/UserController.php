@@ -4,6 +4,7 @@ namespace RoadMap\Controllers;
 
 use RoadMap\Core\Controller;
 use RoadMap\Models\User;
+use RoadMap\Core\Attributes\Route;
 use RoadMap\Core\Exceptions\DataBaseException;
 
 class UserController extends Controller
@@ -15,14 +16,14 @@ class UserController extends Controller
         parent::__construct($router);
         $this->userModel = new User();
     }
-
+    #[Route('/register', method: 'GET')]
     public function showRegisterForm(): void
     {
         $this->render('user/register', [
             'pageTitle' => 'Регистрация'
         ]);
     }
-
+    #[Route('/register/store', method: 'POST')]
     public function register(): void
     {
         if ($this->getMethod() !== 'POST') {
@@ -90,7 +91,7 @@ class UserController extends Controller
             $this->redirect('/profile');
         }
     }
-
+    #[Route('/login', method: 'GET')]
     public function showLoginForm(): void
     {
         if (isset($_SESSION['user'])) {
@@ -102,6 +103,7 @@ class UserController extends Controller
             'pageTitle' => 'Вход'
         ]);
     }
+    #[Route('/login', method: 'POST')]
     public function login(): void
     {
         if ($this->getMethod() !== 'POST') {
@@ -135,6 +137,7 @@ class UserController extends Controller
             $this->redirect('/login');
         }
     }
+    #[Route('/profile', method: 'GET')]
     public function profile(): void
     {
         if (!isset($_SESSION['user'])) {
@@ -149,6 +152,7 @@ class UserController extends Controller
             'user' => $user
         ]);
     }
+    #[Route('/logout', method: 'GET')]
     public function logout(): void
     {
         session_destroy();

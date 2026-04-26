@@ -4,6 +4,7 @@ namespace RoadMap\Controllers;
 
 use RoadMap\Core\Controller;
 use RoadMap\Models\Incident;
+use RoadMap\Core\Attributes\Route;
 
 class IncidentController extends Controller
 {
@@ -13,6 +14,7 @@ class IncidentController extends Controller
         parent::__construct($router);
         $this->incidentModel = new Incident();
     }
+    #[Route('/incidents', method: 'GET')]
     public function index(): void
     {
         $incidents = $this->incidentModel->getAll();
@@ -22,12 +24,14 @@ class IncidentController extends Controller
             'incidents' => $incidents
         ]);
     }
+    #[Route('/incidents/create', method: 'GET')]
     public function create(): void
     {
         $this->render('incidentsCreate', [
             'pageTitle' => 'Добавить происшествие'
         ]);
     }
+    #[Route('/incidents/store', method: 'POST')]
     public function store(): void
     {
         $method = $this->getMethod();

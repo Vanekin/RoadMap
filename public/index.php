@@ -8,6 +8,9 @@ use RoadMap\Core\Logger;
 use RoadMap\Core\Config;
 use RoadMap\Core\Exceptions\EnvFileNotFoundException;
 use RoadMap\Core\Exceptions\ConfigException;
+use RoadMap\Controllers\HomeController;
+use RoadMap\Controllers\IncidentController;
+use RoadMap\Controllers\UserController;
 
 set_exception_handler(function (Throwable $e) {
     $code = $e->getCode();
@@ -62,9 +65,14 @@ try {
     throw $e;
 }
 
+$controllers = [
+    HomeController::class,
+    IncidentController::class,
+    UserController::class,
+];
 
+$router = new Router($controllers);
 
-$routes = require_once __DIR__ . '/../src/Core/routes.php';
 
 $requestUri = $_SERVER['REQUEST_URI'];
 $url = parse_url($requestUri, PHP_URL_PATH);
@@ -73,5 +81,4 @@ if (empty($url)) {
     $url = '/';
 }
 
-$router = new Router($routes);
 $router->dispatch($url);

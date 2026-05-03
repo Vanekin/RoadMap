@@ -55,5 +55,4 @@ class IncidentController extends Controller
             'address' => $address
         ]);
     }
-
 }

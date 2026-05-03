@@ -1,7 +1,8 @@
 <?php
 
-
 namespace RoadMap\Core;
+
+use RoadMap\Core\Middleware\MiddlewareInterface;
 use RoadMap\Core\Exceptions\CriticallException;
 use RoadMap\Core\Exceptions\PageNotFoundException;
 use RoadMap\Core\Attributes\Route;
@@ -10,6 +11,7 @@ class Router
 {
     private array $routes;
     private string $method;
+    private array $middlewares = [];
     private array $urlParams = [];
     private array $requestParams = [];
     private array $files;
@@ -23,6 +25,27 @@ class Router
         $this->register($controllers);
     }
 
+    public function addMiddleware(MiddlewareInterface $middleware): self
+    {
+        $this->middlewares[] = $middleware;
+        return $this;
+    }
+
+    private function runWithMiddleware(callable $handler)
+    {
+        // Строим цепочку middleware
+        $pipeline = array_reduce(
+            array_reverse($this->middlewares),
+            function ($next, MiddlewareInterface $middleware) {
+                return function () use ($middleware, $next) {
+                    return $middleware->process($next);
+                };
+            },
+            $handler
+        );
+
+        return $pipeline();
+    }
     public function register(array $controllers): void
     {
         foreach ($controllers as $controllerClass) {
@@ -74,8 +97,14 @@ class Router
     {
         return $this->method;
     }
-
     public function dispatch(string $url): void
+    {
+        $this->runWithMiddleware(function () use ($url) {
+            $this->doDispatch($url);
+        });
+    }
+
+    public function doDispatch(string $url): void
     {
         // Статические файлы
         $fullPath = __DIR__ . '/../../public' . $url;

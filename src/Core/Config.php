@@ -45,7 +45,6 @@ class Config
             throw new EnvFileNotFoundException(
                 "Файл .env не найден: {$this->envPath}/.env"
             );
-
         }
         $dotenv = Dotenv::createImmutable($this->envPath);
         $dotenv->load();

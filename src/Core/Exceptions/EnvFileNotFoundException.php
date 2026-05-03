@@ -1,8 +1,11 @@
 <?php
 
 namespace RoadMap\Core\Exceptions;
+
 use Exception;
-class EnvFileNotFoundException extends Exception {
+
+class EnvFileNotFoundException extends Exception
+{
     protected $code = 500;
 
     public function __construct(
@@ -18,5 +21,4 @@ class EnvFileNotFoundException extends Exception {
         return "Не удалось загрузить конфигурацию приложения. "
             . "Пожалуйста, убедитесь, что файл конфигурации существует и доступен для чтения.";
     }
-
 }

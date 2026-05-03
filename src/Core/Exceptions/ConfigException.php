@@ -1,7 +1,11 @@
 <?php
+
 namespace RoadMap\Core\Exceptions;
+
 use Exception;
-class ConfigException extends Exception {
+
+class ConfigException extends Exception
+{
     protected $code = 500;
     public function __construct(
         string $message = "Ошибка конфигурации приложения",

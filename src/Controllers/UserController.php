@@ -116,8 +116,12 @@ class UserController extends Controller
 
         $errors = [];
 
-        if (empty($email)) $errors['email'] = 'Email обязателен';
-        if (empty($password)) $errors['password'] = 'Пароль обязателен';
+        if (empty($email)) {
+            $errors['email'] = 'Email обязателен';
+        }
+        if (empty($password)) {
+            $errors['password'] = 'Пароль обязателен';
+        }
 
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;

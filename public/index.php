@@ -6,6 +6,7 @@ session_start();
 use RoadMap\Core\Router;
 use RoadMap\Core\Logger;
 use RoadMap\Core\Config;
+use RoadMap\Core\Middleware\LoggingMiddleware;
 use RoadMap\Core\Exceptions\EnvFileNotFoundException;
 use RoadMap\Core\Exceptions\ConfigException;
 use RoadMap\Controllers\HomeController;
@@ -72,6 +73,7 @@ $controllers = [
 ];
 
 $router = new Router($controllers);
+$router->addMiddleware(new LoggingMiddleware());
 
 
 $requestUri = $_SERVER['REQUEST_URI'];

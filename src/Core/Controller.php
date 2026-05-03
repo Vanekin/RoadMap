@@ -4,7 +4,8 @@ namespace RoadMap\Core;
 
 use RoadMap\Core\Exceptions\CriticallException;
 
-abstract class Controller {
+abstract class Controller
+{
     protected Router $router;
 
     public function __construct(Router $router)

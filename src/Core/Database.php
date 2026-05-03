@@ -45,7 +45,6 @@ class Database
             $this->connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
             $this->logger->info('Database connection established');
-
         } catch (PDOException $e) {
             $this->logger->error('Database connection failed: ' . $e->getMessage());
 
